@@ -46,6 +46,7 @@ class Gui extends JFrame {
     private JButton read = new JButton("Read Contact");
     private JButton update = new JButton("Update Contact");
     private JButton delete = new JButton("Delete Contact");
+    final CharSequence forIdErrors = ('ä', 'Ä', 'ö', 'Ö', 'å', 'Å');
 
     public Gui() {
         // Frame layout and title for main window
@@ -72,8 +73,24 @@ class Gui extends JFrame {
         add(new JLabel("e-mail (optional):"));
         add(email);
 
+        // Error checks for input
+        public boolean errorChecks() {
+            if(id.getText().isEmpty() || firstName.getText().isEmpty() || 
+                lastName.getText().isEmpty() || phoneNumber.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(new JFrame(), "Fill mandatory fields", JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+            if(id.getText().length() < 11 || id.contains(forIdErrors)) {
+                JOptionPane.showMessageDialog(new JFrame(), "Enter Finnish Id", JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+        }
+
         // Methods for buttons
         public void saveFile() {
+            if(errorChecks()) {
+                return;
+            }
             FileOutputStream outputFile = new FileOutputStream("Contacts.txt");
             ObjectOutputStream outputObject = new ObjectOutputStream(outputFile);
             outputObject.writeObject(Gui.contactList);
