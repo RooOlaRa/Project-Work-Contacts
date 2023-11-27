@@ -73,9 +73,15 @@ class Gui extends JFrame {
         add(email);
 
         // Methods for buttons
+        public void saveFile() {
+            FileOutputStream outputFile = new FileOutputStream("Contacts.txt");
+            ObjectOutputStream outputObject = new ObjectOutputStream(outputFile);
+            outputObject.writeObject(Gui.contactList);
+            outputObject.close();
+        }
 
         public void saveButtonPress() {
-
+            saveFile();
         }
 
         public void readButtonPress() {
@@ -84,6 +90,7 @@ class Gui extends JFrame {
             for(Contact contact : Gui.contactList) {
                 forReading.append(contact.getAll());
             }
+            forReading.append("\n");
         }
 
         public void updateButtonPress() {
