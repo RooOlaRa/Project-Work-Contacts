@@ -1,12 +1,12 @@
-// DONE: Basic framework for GUI and Contact class.
-// TODO for class Contact: Getters and input validation.
-// TODO for GUI: Make the buttons call on methods 
-// TODO New classes: ButtonMethods(?), FileMethods, viewWindow
+// TODO input validation
+// TODO for GUI: Make the buttons call on methods (reading done)
+// TODO methods for saving, updating and deleting a contact
 
-import java.io.Console;
+import java.io.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * Simple contacts application for creating, reading, updating and deleting contacts.
@@ -31,81 +31,89 @@ class Gui extends JFrame {
         new Gui().setVisible(true);
     }
 
+    // Create arraylist for saving contacts
+    private ArrayList<Contact> contactList = new ArrayList<>();
+
+    // Create text fields, buttons and text display area  
+    private JTextField id = new JTextField();
+    private JTextField firstName = new JTextField();
+    private JTextField lastName = new JTextField();
+    private JTextField phoneNumber = new JTextField();
+    private JTextField address = new JTextField();
+    private JTextField email = new JTextField();
+    private JTextArea forReading = new JTextArea();
+    private JButton save = new JButton("Save Contact");
+    private JButton read = new JButton("Read Contact");
+    private JButton update = new JButton("Update Contact");
+    private JButton delete = new JButton("Delete Contact");
+
     public Gui() {
         // Frame layout and title for main window
         setTitle("Contacts");
-        setSize(800, 400);
-        // Shuts down the program instead of hiding it when
-        // clicking "x" to shut down the GUI.
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(8, 2));
+        setSize(800, 600);
+        setLayout(new FlowLayout());
 
-        // Create text fields
-        JTextField textField1 = new JTextField();
-        JTextField textField2 = new JTextField();
-        JTextField textField3 = new JTextField();
-        JTextField textField4 = new JTextField();
-        JTextField textField5 = new JTextField();
-        JTextField textField6 = new JTextField();
+        // Add labels and their matching text fields
+        add(new JLabel("ID:"));
+        add(id);
 
-        // Create buttons
-        JButton button1 = new JButton("Save Contact");
-        JButton button2 = new JButton("Read Contact");
-        JButton button3 = new JButton("Update Contact");
-        JButton button4 = new JButton("Delete Contact");
-
-        // Add text fields, labels and buttons
-        add(new JLabel("Personal ID:"));
-        add(textField1);
         add(new JLabel("First Name:"));
-        add(textField2);
+        add(firstName);
+
         add(new JLabel("Last Name:"));
-        add(textField3);
+        add(lastName);
+
         add(new JLabel("Phone Number:"));
-        add(textField4);
+        add(phoneNumber);
+
         add(new JLabel("Address (optional):"));
-        add(textField5);
+        add(address);
+
         add(new JLabel("e-mail (optional):"));
-        add(textField6);
-        add(button1);
-        add(button2);
-        add(button3);
-        add(button4);
+        add(email);
 
-        // Add action listeners to the buttons
-        button1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Button 1 clicked");
-            }
-        });
+        // Methods for buttons
 
-        button2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Button 2 clicked");
-            }
-        });
+        public void saveButtonPress() {
 
-        button3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Button 3 clicked");
-            }
-        });
+        }
 
-        button4.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Button 4 clicked");
+        public void readButtonPress() {
+            display.selectAll();
+            display.replaceSelection("");
+            for(Contact contact : Gui.contactList) {
+                forReading.append(contact.getAll());
             }
-        });
+        }
+
+        public void updateButtonPress() {
+            for(Contact contact : Gui.contactList) {
+
+            }
+        }
+
+        public void deleteButtonPress() {
+            for(Contact contact : Gui.contactList) {
+                
+            }
+        }
+
+        // Add buttons
+        add(save);
+        add(read);
+        add(update);
+        add(delete);
+
+        // Add action listeners
+        save.addActionListener(e -> saveButtonPress());
+        read.addActionListener(e -> readButtonPress());
+        update.addActionListener(e -> updateButtonPress());
+        delete.addActionListener(e -> deleteButtonPress());
     }
 }
 
 /**
- * Class for creating and updating contacts.
- * Will mostly use this for input validation.
+ * Class for saving contact information
  */
 class Contact {
     private String id;
@@ -115,34 +123,41 @@ class Contact {
     private String address;
     private String email;
 
-    // only setters are done for now
-    // _do input validation_
-
-    public void setId (String id) {
+    public Contact(String id, String firstName, String lastName, String phoneNumber,String address, String email) {
         this.id = id;
-    }
-
-    public void setFirstName (String firstName) {
         this.firstName = firstName;
-    }
-
-    public void setLastName (String lastName) {
         this.lastName = lastName;
-    }
-
-    public void setPhoneNumber (String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public void setAddress (String address) {
         this.address = address;
-    }
-
-    public void setEmail (String email) {
         this.email = email;
     }
+    // returns attributes of class as string for saving data to text file
+    public String getId() {
+        return "Id: " + id + "\n";
+    }
 
-    public void saveContact() {
+    public String getFirstName() {
+        return "First name: " + firstName + "\n";
+    }
 
+    public String getLastName() {
+        return "Last name: " + lastName + "\n";
+    }
+
+    public String getPhoneNumber() {
+        return "Phone number: " phoneNumber + "\n";
+    }
+
+    public String getAddress() {
+        return "Address: " + address + "\n";
+    }
+
+    public String getEmail() {
+        return "Email: " + email + "\n";
+    }
+
+    public String getAll() {
+        return getId() + getFirstName() + getLastName() +
+                getPhoneNumber() + getAddress() + getEmail();
     }
 }
