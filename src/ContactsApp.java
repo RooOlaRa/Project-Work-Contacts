@@ -34,7 +34,7 @@ class Gui extends JFrame {
     private JTextField phoneNumber = new JTextField();
     private JTextField address = new JTextField();
     private JTextField email = new JTextField();
-    private JTextArea forReading = new JTextArea();
+    private JTextArea contactsDisplay = new JTextArea();
     private JButton save = new JButton("Save Contact");
     private JButton read = new JButton("View Contacts");
     private JButton update = new JButton("Update Contact");
@@ -46,17 +46,17 @@ class Gui extends JFrame {
         setTitle("Contacts Application");
         setSize(800, 600);
 
-        // Program shuts down when clicking "x" in window
+        // Program shuts down when clicking "x" in main window
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Add labels and their matching text fields
-        add(new JLabel("ID:"));
+        add(new JLabel("ID (mandatory):"));
         add(id);
-        add(new JLabel("First Name:"));
+        add(new JLabel("First Name (mandatory):"));
         add(firstName);
-        add(new JLabel("Last Name:"));
+        add(new JLabel("Last Name (mandatory):"));
         add(lastName);
-        add(new JLabel("Phone Number:"));
+        add(new JLabel("Phone Number (mandatory):"));
         add(phoneNumber);
         add(new JLabel("Address (optional):"));
         add(address);
@@ -70,7 +70,7 @@ class Gui extends JFrame {
         add(delete);
 
         // Add display for reading contacts
-        forReading.setEditable(false);
+        contactsDisplay.setEditable(false);
         setVisible(true);
 
         // Add action listeners
@@ -127,28 +127,33 @@ class Gui extends JFrame {
         JOptionPane.showMessageDialog(new JFrame(), "Saving Successful", "Saved", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Reads text from a file
+    // Reads text from a file and displays on a JTextArea thats
+    // inside a JScrollPane.
     public void readButtonPress() {
+        // Create new window for displaying list of contacts
         JFrame viewWindow = new JFrame();
         viewWindow.setTitle("Contact List");
         viewWindow.setSize(600, 400);
-        viewWindow.add(new JScrollPane(forReading));
-        forReading.selectAll();
-        forReading.replaceSelection("");
+        viewWindow.add(new JScrollPane(contactsDisplay));
+
+        // Empties contacts display before getting new data from file
+        contactsDisplay.selectAll();
+        contactsDisplay.replaceSelection("");
+
         try {
             FileReader fr = new FileReader("contacts.txt");
             BufferedReader reader = new BufferedReader(fr);
-            forReading.read(reader, "contacts.txt");
+            contactsDisplay.read(reader, "contacts.txt");
             viewWindow.setVisible(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(new JFrame(), "No existing contacts", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        forReading.append("\n");
+        contactsDisplay.append("\n");
     }
 }
 
 /**
- * Class for saving contact information
+ * Class for saving contact information.
  */
 class Contact {
     private String id;
