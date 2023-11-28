@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Simple contacts application for creating, reading, updating and deleting contacts.
@@ -21,16 +22,11 @@ class ContactsApp {
      */
     public static void main(String[] args) {
         // Start GUI
-        Gui.run();
+        new Gui();
     }
 }
 
 class Gui extends JFrame {
-    // Method for creating a new window.
-    public static void run() {
-        new Gui().setVisible(true);
-    }
-
     // Create arraylist for saving contacts
     private ArrayList<Contact> contactList = new ArrayList<>();
 
@@ -43,84 +39,33 @@ class Gui extends JFrame {
     private JTextField email = new JTextField();
     private JTextArea forReading = new JTextArea();
     private JButton save = new JButton("Save Contact");
-    private JButton read = new JButton("Read Contact");
+    private JButton read = new JButton("View Contacts");
     private JButton update = new JButton("Update Contact");
     private JButton delete = new JButton("Delete Contact");
-    final CharSequence forIdErrors = ('ä', 'Ä', 'ö', 'Ö', 'å', 'Å');
 
     public Gui() {
         // Frame layout and title for main window
+        setLayout(new GridLayout(9,2));
         setTitle("Contacts");
         setSize(800, 600);
-        setLayout(new FlowLayout());
+        setVisible(true);
+
+        // Program shuts down when clicking "x" in window
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Add labels and their matching text fields
         add(new JLabel("ID:"));
         add(id);
-
         add(new JLabel("First Name:"));
         add(firstName);
-
         add(new JLabel("Last Name:"));
         add(lastName);
-
         add(new JLabel("Phone Number:"));
         add(phoneNumber);
-
         add(new JLabel("Address (optional):"));
         add(address);
-
         add(new JLabel("e-mail (optional):"));
         add(email);
-
-        // Error checks for input
-        public boolean errorChecks() {
-            if(id.getText().isEmpty() || firstName.getText().isEmpty() || 
-                lastName.getText().isEmpty() || phoneNumber.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(new JFrame(), "Fill mandatory fields", JOptionPane.ERROR_MESSAGE);
-                return true;
-            }
-            if(id.getText().length() < 11 || id.contains(forIdErrors)) {
-                JOptionPane.showMessageDialog(new JFrame(), "Enter Finnish Id", JOptionPane.ERROR_MESSAGE);
-                return true;
-            }
-        }
-
-        // Methods for buttons
-        public void saveFile() {
-            if(errorChecks()) {
-                return;
-            }
-            FileOutputStream outputFile = new FileOutputStream("Contacts.txt");
-            ObjectOutputStream outputObject = new ObjectOutputStream(outputFile);
-            outputObject.writeObject(Gui.contactList);
-            outputObject.close();
-        }
-
-        public void saveButtonPress() {
-            saveFile();
-        }
-
-        public void readButtonPress() {
-            display.selectAll();
-            display.replaceSelection("");
-            for(Contact contact : Gui.contactList) {
-                forReading.append(contact.getAll());
-            }
-            forReading.append("\n");
-        }
-
-        public void updateButtonPress() {
-            for(Contact contact : Gui.contactList) {
-
-            }
-        }
-
-        public void deleteButtonPress() {
-            for(Contact contact : Gui.contactList) {
-                
-            }
-        }
 
         // Add buttons
         add(save);
@@ -128,11 +73,76 @@ class Gui extends JFrame {
         add(update);
         add(delete);
 
+        // Add display for reading contacts
+        add(new JScrollPane(forReading));
+        forReading.setEditable(false);
+
         // Add action listeners
         save.addActionListener(e -> saveButtonPress());
         read.addActionListener(e -> readButtonPress());
-        update.addActionListener(e -> updateButtonPress());
-        delete.addActionListener(e -> deleteButtonPress());
+    }
+
+    // Error checks for input
+    public boolean errorChecks() {
+        if(id.getText().isEmpty() || firstName.getText().isEmpty() || 
+            lastName.getText().isEmpty() || phoneNumber.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(new JFrame(), "Fill mandatory fields", "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        if(id.getText().length() != 11) {
+            JOptionPane.showMessageDialog(new JFrame(), "Enter Finnish Id", "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        return false;
+    }
+
+    // Save contact to text file
+    public void saveFile() {
+        if(errorChecks()) {
+            return;
+        }
+        try {
+            FileOutputStream outputFile = new FileOutputStream("Contacts.txt");
+            ObjectOutputStream outputObject = new ObjectOutputStream(outputFile);
+            outputObject.writeObject(contactList);
+            outputObject.close();
+        } catch (IOException e) {
+            
+        }
+    }
+
+    // Clear text fields
+    public void clear() {
+        id.setText("");
+        firstName.setText("");
+        lastName.setText("");
+        phoneNumber.setText("");
+        address.setText("");
+        email.setText("");
+    }
+
+    // Called method when pressing the save button
+    // 
+    public void saveButtonPress() {
+        Contact contactToSave = new Contact(id.getText(), firstName.getText(), lastName.getText(),
+                                    phoneNumber.getText(), address.getText(), email.getText());
+        contactList.add(contactToSave);
+        saveFile();
+        clear();
+    }
+
+    // Reads text from a file
+    public void readButtonPress() {
+        forReading.selectAll();
+        forReading.replaceSelection("");
+        try {
+            FileReader fr = new FileReader("contacts.txt");
+            BufferedReader reader = new BufferedReader(fr);
+            forReading.read(reader, "contacts.txt");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(new JFrame(), "No existing contacts", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        forReading.append("\n");
     }
 }
 
@@ -169,7 +179,7 @@ class Contact {
     }
 
     public String getPhoneNumber() {
-        return "Phone number: " phoneNumber + "\n";
+        return "Phone number: " + phoneNumber + "\n";
     }
 
     public String getAddress() {
