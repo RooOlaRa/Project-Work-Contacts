@@ -1,6 +1,5 @@
 // TODO input validation
-// TODO for GUI: Make the buttons call on methods (reading done)
-// TODO methods for saving, updating and deleting a contact
+// TODO for GUI: Make the buttons call on methods for updating and deleting a contact(reading and saving done)
 
 import java.io.*;
 import javax.swing.*;
@@ -27,8 +26,6 @@ class ContactsApp {
 }
 
 class Gui extends JFrame {
-    // Create arraylist for saving contacts
-    private ArrayList<Contact> contactList = new ArrayList<>();
 
     // Create text fields, buttons and text display area  
     private JTextField id = new JTextField();
@@ -45,10 +42,9 @@ class Gui extends JFrame {
 
     public Gui() {
         // Frame layout and title for main window
-        setLayout(new GridLayout(9,2));
-        setTitle("Contacts");
+        setLayout(new GridLayout(8,2));
+        setTitle("Contacts Application");
         setSize(800, 600);
-        setVisible(true);
 
         // Program shuts down when clicking "x" in window
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -74,8 +70,8 @@ class Gui extends JFrame {
         add(delete);
 
         // Add display for reading contacts
-        add(new JScrollPane(forReading));
         forReading.setEditable(false);
+        setVisible(true);
 
         // Add action listeners
         save.addActionListener(e -> saveButtonPress());
@@ -97,15 +93,13 @@ class Gui extends JFrame {
     }
 
     // Save contact to text file
-    public void saveFile() {
-        if(errorChecks()) {
-            return;
-        }
+    public void saveFile(Contact contactToSave) {
         try {
-            FileOutputStream outputFile = new FileOutputStream("Contacts.txt");
-            ObjectOutputStream outputObject = new ObjectOutputStream(outputFile);
-            outputObject.writeObject(contactList);
-            outputObject.close();
+            String stringContactToSave = contactToSave.getAll();
+            BufferedWriter writer = new BufferedWriter(new FileWriter("contacts.txt", true));
+            writer.append(stringContactToSave);
+            writer.append("\n");
+            writer.close();
         } catch (IOException e) {
             
         }
@@ -122,23 +116,30 @@ class Gui extends JFrame {
     }
 
     // Called method when pressing the save button
-    // 
     public void saveButtonPress() {
+        if(errorChecks()) {
+            return;
+        }
         Contact contactToSave = new Contact(id.getText(), firstName.getText(), lastName.getText(),
                                     phoneNumber.getText(), address.getText(), email.getText());
-        contactList.add(contactToSave);
-        saveFile();
+        saveFile(contactToSave);
         clear();
+        JOptionPane.showMessageDialog(new JFrame(), "Saving Successful", "Saved", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // Reads text from a file
     public void readButtonPress() {
+        JFrame viewWindow = new JFrame();
+        viewWindow.setTitle("Contact List");
+        viewWindow.setSize(600, 400);
+        viewWindow.add(new JScrollPane(forReading));
         forReading.selectAll();
         forReading.replaceSelection("");
         try {
             FileReader fr = new FileReader("contacts.txt");
             BufferedReader reader = new BufferedReader(fr);
             forReading.read(reader, "contacts.txt");
+            viewWindow.setVisible(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(new JFrame(), "No existing contacts", "Error", JOptionPane.ERROR_MESSAGE);
         }
