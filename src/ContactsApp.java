@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import java.awt.GridLayout;
+import java.util.stream.Collectors;
 
 /**
 * Simple contacts application for creating,
@@ -134,7 +135,7 @@ public class ContactsApp extends JFrame {
      * Checks for errors in textfield input.
      * Displays an error message if mandatory fields are not filled
      * or if the Finnish ID length is incorrect.
-     * @return true if there are errors, false otherwise
+     * @return true if there are errors otherwise false
      */
     public boolean errorChecks() {
         final int idLength = 11;
@@ -181,15 +182,24 @@ public class ContactsApp extends JFrame {
     }
 
     /**
+     * Makes new contact from user input in
+     * textfields.
+     * @return Constructed contact
+     */
+    public Contact newContact() {
+        return new Contact(id.getText(), firstName.getText(),
+                            lastName.getText(), phoneNumber.getText(),
+                            address.getText(), email.getText());
+    }
+
+    /**
      * Handles the button press for saving a contact.
      */
     public void saveButtonPress() {
         if (errorChecks()) {
             return;
         }
-        Contact contactToSave = new Contact(id.getText(), firstName.getText(),
-                                    lastName.getText(), phoneNumber.getText(),
-                                    address.getText(), email.getText());
+        Contact contactToSave = newContact();
         saveFile(contactToSave);
         clear();
         JOptionPane.showMessageDialog(new JFrame(), "Saving Successful",
@@ -214,12 +224,14 @@ public class ContactsApp extends JFrame {
         try {
             FileReader fr = new FileReader("contacts.txt");
             BufferedReader reader = new BufferedReader(fr);
-            contactsDisplay.read(reader, "contacts.txt");
+            String strToDisplay = reader.lines().collect(Collectors.joining());
+            stringToDisplay = strToDisplay.replaceAll(">", "\n");
+            stringToDisplay = strToDisplay.replaceAll("--", "\n");
+            contactsDisplay.append(strToDisplay);
             viewWindow.setVisible(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(new JFrame(), "No existing contacts",
             "Error", JOptionPane.ERROR_MESSAGE);
         }
-        contactsDisplay.append("\n");
     }
 }

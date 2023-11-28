@@ -50,42 +50,42 @@ public class Contact {
     * @return Formatted string that includes this.id
     */
     public String getId() {
-        return "Id: " + id + "\n";
+        return "Id: " + id + ">";
     }
 
     /**
     * @return Formatted string that includes this.firstName
     */
     public String getFirstName() {
-        return "First name: " + firstName + "\n";
+        return "First name: " + firstName + ">";
     }
 
     /**
     * @return Formatted string that includes this.lastName
     */
     public String getLastName() {
-        return "Last name: " + lastName + "\n";
+        return "Last name: " + lastName + ">";
     }
 
     /**
     * @return Formatted string that includes this.phoneNumber
     */
     public String getPhoneNumber() {
-        return "Phone number: " + phoneNumber + "\n";
+        return "Phone number: " + phoneNumber + ">";
     }
 
     /**
     * @return Formatted string that includes this.address
     */
     public String getAddress() {
-        return "Address: " + address + "\n";
+        return "Address: " + address + ">";
     }
 
     /**
     * @return Formatted string that includes this.email
     */
     public String getEmail() {
-        return "Email: " + email + "\n";
+        return "Email: " + email + ">" + "--";
     }
 
     /**
