@@ -78,7 +78,11 @@ class Gui extends JFrame {
         read.addActionListener(e -> readButtonPress());
     }
 
-    // Error checks for input
+    /**
+     * Checks for errors in textfield input.
+     * Displays an error message if mandatory fields are not filled or if the Finnish ID length is incorrect.
+     * @return true if there are errors, false otherwise
+     */
     public boolean errorChecks() {
         if(id.getText().isEmpty() || firstName.getText().isEmpty() || 
             lastName.getText().isEmpty() || phoneNumber.getText().isEmpty()) {
@@ -92,7 +96,10 @@ class Gui extends JFrame {
         return false;
     }
 
-    // Save contact to text file
+    /**
+     * Saves the contact information to a file.
+     * @param contactToSave The Contact to be saved
+     */
     public void saveFile(Contact contactToSave) {
         try {
             String stringContactToSave = contactToSave.getAll();
@@ -105,7 +112,9 @@ class Gui extends JFrame {
         }
     }
 
-    // Clear text fields
+    /**
+     * Clears the input fields.
+     */
     public void clear() {
         id.setText("");
         firstName.setText("");
@@ -115,7 +124,9 @@ class Gui extends JFrame {
         email.setText("");
     }
 
-    // Called method when pressing the save button
+    /**
+     * Handles the button press for saving a contact.
+     */
     public void saveButtonPress() {
         if(errorChecks()) {
             return;
@@ -127,16 +138,16 @@ class Gui extends JFrame {
         JOptionPane.showMessageDialog(new JFrame(), "Saving Successful", "Saved", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Reads text from a file and displays on a JTextArea thats
-    // inside a JScrollPane.
+    /**
+     * Handles the button press for reading and displaying contacts
+     * from a file.
+     */
     public void readButtonPress() {
-        // Create new window for displaying list of contacts
+        // Frame layout and title for displaying contact list
         JFrame viewWindow = new JFrame();
         viewWindow.setTitle("Contact List");
         viewWindow.setSize(600, 400);
         viewWindow.add(new JScrollPane(contactsDisplay));
-
-        // Empties contacts display before getting new data from file
         contactsDisplay.selectAll();
         contactsDisplay.replaceSelection("");
 
@@ -152,9 +163,7 @@ class Gui extends JFrame {
     }
 }
 
-/**
- * Class for saving contact information.
- */
+
 class Contact {
     private String id;
     private String firstName;
@@ -171,7 +180,7 @@ class Contact {
         this.address = address;
         this.email = email;
     }
-    // returns attributes of class as string for saving data to text file
+
     public String getId() {
         return "Id: " + id + "\n";
     }
