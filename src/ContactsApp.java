@@ -157,8 +157,8 @@ public class ContactsApp extends JFrame {
         }
         // Clear text fields
         clearTextFields();
-        JOptionPane.showMessageDialog(new JFrame(), "Saving Successful",
-        "Saved", JOptionPane.INFORMATION_MESSAGE);
+        // Create information message pane
+        infoPane("Saving Successful");
     }
 //----------------------READING-CONTACTS-------------------------
     /**
@@ -198,8 +198,8 @@ public class ContactsApp extends JFrame {
         String replacement = getInformationString();
         // Call editContact with replacement String
         editContact(replacement);
-        JOptionPane.showMessageDialog(new JFrame(), "Contact updated",
-                            "Update", JOptionPane.INFORMATION_MESSAGE);
+        // Create information message pane
+        infoPane("Contact updated");
     }
 
 //----------------------DELETING-CONTACT-------------------------
@@ -213,10 +213,19 @@ public class ContactsApp extends JFrame {
         String replacement = "";
         // Call editContact with replacement String
         editContact(replacement);
-        JOptionPane.showMessageDialog(new JFrame(), "Contact deleted",
-                            "Delete", JOptionPane.INFORMATION_MESSAGE);
+        // Create information message pane
+        infoPane("Contact deleted");
     }
 //----------------------ERROR-HANDLING-------------------------
+    /**
+     * Creates JOptionPane that shows error message
+     * @param errorMessage error message to display
+     */
+    public void errorPane(final String errorMessage) {
+        JOptionPane.showMessageDialog(new JFrame(), errorMessage,
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
     /**
      * Checks for errors in textfield input.
      * @return true if there are errors, otherwise false
@@ -225,8 +234,8 @@ public class ContactsApp extends JFrame {
         final int idLength = 11;
         // If ID is already saved in file then ERROR
         if (fileToString().contains(id.getText().toUpperCase())) {
-            JOptionPane.showMessageDialog(new JFrame(), "Id already saved",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
+            // Create error message pane
+            errorPane("Id already saved");
             return true;
         }
         // For checking if '-' is in the right index of id
@@ -234,27 +243,36 @@ public class ContactsApp extends JFrame {
         // If ID is in wrong format
         if (id.getText().length() != idLength
             || id.getText().charAt(id.getText().length() - idCheck) != '-') {
-            JOptionPane.showMessageDialog(new JFrame(), "Enter Finnish Id",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
+            // Create error message pane
+            errorPane("Enter Finnish Id");
             return true;
         }
         // If mandatory fields are not filled
         if (id.getText().isEmpty() || firstName.getText().isEmpty()
         || lastName.getText().isEmpty() || phoneNumber.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(), "Fill mandatory fields",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
+            // Create error message pane
+            errorPane("Fill mandatory fields");
             return true;
         }
         // If email doesnt contain a dot or @
         if (!email.getText().isEmpty() && (!email.getText().contains("@")
             || !email.getText().contains("."))) {
-            JOptionPane.showMessageDialog(new JFrame(),
-            "Enter valid email address", "Error", JOptionPane.ERROR_MESSAGE);
+            // Create error message pane
+            errorPane("Enter valid email address");
             return true;
         }
         return false;
     }
 //----------------------MISCELLANEOUS-------------------------
+    /**
+     * Creates JOptionPane that shows information message
+     * @param infoMessage information message to display
+     */
+    public void infoPane(final String infoMessage) {
+        JOptionPane.showMessageDialog(new JFrame(), infoMessage,
+                                "Information", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     /**
      * Updates or deletes contact from file
      * based on replacement String.
@@ -267,8 +285,8 @@ public class ContactsApp extends JFrame {
         String currentContacts = fileToString();
         // if idToUpdate is not found in currentContacts
         if (!currentContacts.contains(idToUpdate)) {
-            JOptionPane.showMessageDialog(new JFrame(),
-            "ID to update not found", "Error", JOptionPane.ERROR_MESSAGE);
+            // Create error message pane
+            errorPane("ID to update not found");
             return;
         }
         // Start BufferedReader
@@ -358,9 +376,8 @@ public class ContactsApp extends JFrame {
         try {
             return new String(Files.readAllBytes(Paths.get("contacts.txt")));
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(new JFrame(),
-            "No existing contacts file. Save a contact first.", "Error",
-            JOptionPane.ERROR_MESSAGE);
+            // Create error message pane
+            errorPane("No existing contacts file. Save a contact first.");
             return "";
         }
     }
