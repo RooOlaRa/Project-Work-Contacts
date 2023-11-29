@@ -138,8 +138,8 @@ public class ContactsApp extends JFrame {
      * Handles the button press for saving a contact.
      */
     public void saveButtonPress() {
-        // If errors found in textfield input return
-        if (textFieldErrorChecks()) {
+        // Check for input errors
+        if (inputValidation()) {
             return;
         }
         try {
@@ -191,7 +191,8 @@ public class ContactsApp extends JFrame {
      * wanted contact.
      */
     public void updateButtonPress() {
-        if (textFieldErrorChecks()) {
+        // Check for input errors
+        if (inputValidation()) {
             return;
         }
         // String that replaces old information
@@ -218,7 +219,7 @@ public class ContactsApp extends JFrame {
     }
 //----------------------ERROR-HANDLING-------------------------
     /**
-     * Creates JOptionPane that shows error message
+     * Creates JOptionPane that shows error message.
      * @param errorMessage error message to display
      */
     public void errorPane(final String errorMessage) {
@@ -230,7 +231,7 @@ public class ContactsApp extends JFrame {
      * Checks for errors in textfield input.
      * @return true if there are errors, otherwise false
      */
-    public boolean textFieldErrorChecks() {
+    public boolean inputValidation() {
         final int idLength = 11;
         // If ID is already saved in file then ERROR
         if (fileToString().contains(id.getText().toUpperCase())) {
@@ -265,7 +266,7 @@ public class ContactsApp extends JFrame {
     }
 //----------------------MISCELLANEOUS-------------------------
     /**
-     * Creates JOptionPane that shows information message
+     * Creates JOptionPane that shows information message.
      * @param infoMessage information message to display
      */
     public void infoPane(final String infoMessage) {
@@ -317,7 +318,7 @@ public class ContactsApp extends JFrame {
             }
         }
         try {
-            // Start new BufferedWriter that also empties file of text
+            // Start new BufferedWriter that also empties file
             BufferedWriter writer = Files.newBufferedWriter(Paths.get(
                         "contacts.txt"), StandardOpenOption.TRUNCATE_EXISTING);
             // Write updated lines to contacts.txt
@@ -346,7 +347,7 @@ public class ContactsApp extends JFrame {
     }
 
     /**
-     * Clears the input fields.
+     * Clears text fields.
      */
     public void clearTextFields() {
         id.setText("");
