@@ -275,6 +275,52 @@ public class ContactsApp extends JFrame {
     }
 
     /**
+     * Get current contact information as string.
+     * @return string with contact information
+     */
+    public String getInformationString() {
+        Contact updatedContact = newContact();
+        return updatedContact.getAll();
+    }
+
+    /**
+     * Clears text fields.
+     */
+    public void clearTextFields() {
+        id.setText("");
+        firstName.setText("");
+        lastName.setText("");
+        phoneNumber.setText("");
+        address.setText("");
+        email.setText("");
+    }
+
+    /**
+     * Makes new contact from user input in
+     * textfields.
+     * @return Constructed contact
+     */
+    public Contact newContact() {
+        return new Contact(id.getText().toUpperCase(), firstName.getText(),
+                            lastName.getText(), phoneNumber.getText(),
+                            address.getText(), email.getText());
+    }
+
+    /**
+     * Gets data from file to String.
+     * @return String with from text file.
+     */
+    public String fileToString() {
+        try {
+            return new String(Files.readAllBytes(Paths.get("contacts.txt")));
+        } catch (IOException e) {
+            // Create error message pane
+            errorPane("No existing contacts file. Save a contact first.");
+            return "";
+        }
+    }
+//----------------------FOR-UPDATING-AND-DELETING-------------------------
+    /**
      * Updates or deletes contact from file
      * based on replacement String.
      * @param replacement String that replaces contact line in file
@@ -334,52 +380,6 @@ public class ContactsApp extends JFrame {
             // Clear text fields
             clearTextFields();
         } catch (IOException e) {
-        }
-    }
-
-    /**
-     * Get current contact information as string.
-     * @return string with contact information
-     */
-    public String getInformationString() {
-        Contact updatedContact = newContact();
-        return updatedContact.getAll();
-    }
-
-    /**
-     * Clears text fields.
-     */
-    public void clearTextFields() {
-        id.setText("");
-        firstName.setText("");
-        lastName.setText("");
-        phoneNumber.setText("");
-        address.setText("");
-        email.setText("");
-    }
-
-    /**
-     * Makes new contact from user input in
-     * textfields.
-     * @return Constructed contact
-     */
-    public Contact newContact() {
-        return new Contact(id.getText().toUpperCase(), firstName.getText(),
-                            lastName.getText(), phoneNumber.getText(),
-                            address.getText(), email.getText());
-    }
-
-    /**
-     * Gets data from file to String.
-     * @return String with from text file.
-     */
-    public String fileToString() {
-        try {
-            return new String(Files.readAllBytes(Paths.get("contacts.txt")));
-        } catch (IOException e) {
-            // Create error message pane
-            errorPane("No existing contacts file. Save a contact first.");
-            return "";
         }
     }
 }
