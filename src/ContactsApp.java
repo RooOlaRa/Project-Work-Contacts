@@ -1,13 +1,14 @@
 // TODO input validation
-// TODO for ContactsApp: Make the buttons call on methods
-// for updating and deleting a contact(reading and saving done)
 
 import java.awt.GridLayout;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -15,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import java.util.ArrayList;
 
 /**
 * Simple contacts application for creating,
@@ -128,50 +130,207 @@ public class ContactsApp extends JFrame {
         // Add action listeners
         save.addActionListener(e -> saveButtonPress());
         read.addActionListener(e -> readButtonPress());
+        update.addActionListener(e -> updateButtonPress());
+        delete.addActionListener(e -> deleteButtonPress());
+    }
+//----------------------SAVING-CONTACT-------------------------
+    /**
+     * Handles the button press for saving a contact.
+     */
+    public void saveButtonPress() {
+        // If errors found in textfield input return
+        if (textFieldErrorChecks()) {
+            return;
+        }
+        try {
+            // Get Contact information as String
+            String stringContactToSave = getInformationString();
+            // Make writers
+            FileWriter fWriter = new FileWriter("contacts.txt", true);
+            BufferedWriter writer = new BufferedWriter(fWriter);
+            // Write stringContactToSave to end of file
+            writer.append(stringContactToSave);
+            // Close writers
+            writer.close();
+            fWriter.close();
+        } catch (IOException e) {
+        }
+        // Clear text fields
+        clearTextFields();
+        JOptionPane.showMessageDialog(new JFrame(), "Saving Successful",
+        "Saved", JOptionPane.INFORMATION_MESSAGE);
+    }
+//----------------------READING-CONTACTS-------------------------
+    /**
+     * Handles the button press for reading and displaying contacts
+     * from a file.
+     */
+    public void readButtonPress() {
+        // Frame layout and title for displaying contact list
+        JFrame viewWindow = new JFrame();
+        final int contactsX = 600;
+        final int contactsY = 400;
+        viewWindow.setTitle("Contact List");
+        viewWindow.setSize(contactsX, contactsY);
+        viewWindow.add(new JScrollPane(contactsDisplay));
+        // Empty contactsDisplay text area
+        contactsDisplay.selectAll();
+        contactsDisplay.replaceSelection("");
+        // Call fileToString() to get string for display
+        String strToDisplay = fileToString();
+        // Format string to look nice
+        strToDisplay = strToDisplay.replaceAll(">", "\n");
+        // Append string to display
+        contactsDisplay.append(strToDisplay);
+        viewWindow.setVisible(true);
+    }
+//----------------------UPDATING-CONTACT-------------------------
+    /**
+     * Handles the button press for updating contact in
+     * existing file. Gets all existing contact information and update
+     * wanted contact.
+     */
+    public void updateButtonPress() {
+        if (textFieldErrorChecks()) {
+            return;
+        }
+        // String that replaces old information
+        String replacement = getInformationString();
+        // Call editContact with replacement String
+        editContact(replacement);
+        JOptionPane.showMessageDialog(new JFrame(), "Contact updated",
+                            "Update", JOptionPane.INFORMATION_MESSAGE);
     }
 
+//----------------------DELETING-CONTACT-------------------------
+    /**
+     * Handles the button press for deleting contact in
+     * existing file. Is also the method that
+     * handles the deleting itself.
+     */
+    public void deleteButtonPress() {
+        // String that replaces old information
+        String replacement = "";
+        // Call editContact with replacement String
+        editContact(replacement);
+        JOptionPane.showMessageDialog(new JFrame(), "Contact deleted",
+                            "Delete", JOptionPane.INFORMATION_MESSAGE);
+    }
+//----------------------ERROR-HANDLING-------------------------
     /**
      * Checks for errors in textfield input.
-     * Displays an error message if mandatory fields are not filled
-     * or if the Finnish ID length is incorrect.
-     * @return true if there are errors otherwise false
+     * @return true if there are errors, otherwise false
      */
-    public boolean errorChecks() {
+    public boolean textFieldErrorChecks() {
         final int idLength = 11;
+        // If ID is already saved in file then ERROR
+        if (fileToString().contains(id.getText().toUpperCase())) {
+            JOptionPane.showMessageDialog(new JFrame(), "Id already saved",
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        // For checking if '-' is in the right index of id
+        final int idCheck = 5;
+        // If ID is in wrong format
+        if (id.getText().length() != idLength
+            || id.getText().charAt(id.getText().length() - idCheck) != '-') {
+            JOptionPane.showMessageDialog(new JFrame(), "Enter Finnish Id",
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        // If mandatory fields are not filled
         if (id.getText().isEmpty() || firstName.getText().isEmpty()
         || lastName.getText().isEmpty() || phoneNumber.getText().isEmpty()) {
             JOptionPane.showMessageDialog(new JFrame(), "Fill mandatory fields",
                                         "Error", JOptionPane.ERROR_MESSAGE);
             return true;
         }
-        if (id.getText().length() != idLength) {
-            JOptionPane.showMessageDialog(new JFrame(), "Enter Finnish Id",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
+        // If email doesnt contain a dot or @
+        if (!email.getText().isEmpty() && (!email.getText().contains("@")
+            || !email.getText().contains("."))) {
+            JOptionPane.showMessageDialog(new JFrame(),
+            "Enter valid email address", "Error", JOptionPane.ERROR_MESSAGE);
             return true;
         }
         return false;
     }
-
+//----------------------MISCELLANEOUS-------------------------
     /**
-     * Saves the contact information to a file.
-     * @param contactToSave The Contact to be saved
+     * Updates or deletes contact from file
+     * based on replacement String.
+     * @param replacement String that replaces contact line in file
      */
-    public void saveFile(final Contact contactToSave) {
+    public void editContact(final String replacement) {
+        // Get Id from textfield
+        String idToUpdate = id.getText().toUpperCase();
+        // Get String from File data
+        String currentContacts = fileToString();
+        // if idToUpdate is not found in currentContacts
+        if (!currentContacts.contains(idToUpdate)) {
+            JOptionPane.showMessageDialog(new JFrame(),
+            "ID to update not found", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // Start BufferedReader
+        BufferedReader bReader = new BufferedReader(
+                                new StringReader(currentContacts));
+        // New ArrayList to save lines of text from file
+        ArrayList<String> lines = new ArrayList<>();
+        // String used for storing a line
+        String rLine;
         try {
-            String stringContactToSave = contactToSave.getAll();
-            FileWriter fWriter = new FileWriter("contacts.txt", true);
-            BufferedWriter writer = new BufferedWriter(fWriter);
-            writer.append(stringContactToSave);
-            writer.append("\n");
+            // while there are lines left
+            while ((rLine = bReader.readLine()) != null) {
+                // add String rLine to ArrayList lines
+                lines.add(rLine);
+            }
+            bReader.close();
+        } catch (IOException e) {
+        }
+        // iterate through lines saved in ArrayList
+        for (int i = 0; i < lines.size(); i++) {
+            // get line at ArrayList index i
+            String line = lines.get(i);
+            if (line.contains(idToUpdate)) {
+                // replace line that contains idToUpdate
+                // with replacement parameter
+                lines.set(i, replacement);
+                break;
+            }
+        }
+        try {
+            // Start new BufferedWriter that also empties file of text
+            BufferedWriter writer = Files.newBufferedWriter(Paths.get(
+                        "contacts.txt"), StandardOpenOption.TRUNCATE_EXISTING);
+            // Write updated lines to contacts.txt
+            // from ArrayList lines
+            for (String line : lines) {
+                // formatting for Strings so saved data stays
+                // consistent
+                line = line.replaceAll("\n", "");
+                writer.write(line);
+                writer.write("\n");
+            }
             writer.close();
+            // Clear text fields
+            clearTextFields();
         } catch (IOException e) {
         }
     }
 
     /**
+     * Get current contact information as string.
+     * @return string with contact information
+     */
+    public String getInformationString() {
+        Contact updatedContact = newContact();
+        return updatedContact.getAll();
+    }
+
+    /**
      * Clears the input fields.
      */
-    public void clear() {
+    public void clearTextFields() {
         id.setText("");
         firstName.setText("");
         lastName.setText("");
@@ -186,23 +345,9 @@ public class ContactsApp extends JFrame {
      * @return Constructed contact
      */
     public Contact newContact() {
-        return new Contact(id.getText(), firstName.getText(),
+        return new Contact(id.getText().toUpperCase(), firstName.getText(),
                             lastName.getText(), phoneNumber.getText(),
                             address.getText(), email.getText());
-    }
-
-    /**
-     * Handles the button press for saving a contact.
-     */
-    public void saveButtonPress() {
-        if (errorChecks()) {
-            return;
-        }
-        Contact contactToSave = newContact();
-        saveFile(contactToSave);
-        clear();
-        JOptionPane.showMessageDialog(new JFrame(), "Saving Successful",
-        "Saved", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -213,32 +358,10 @@ public class ContactsApp extends JFrame {
         try {
             return new String(Files.readAllBytes(Paths.get("contacts.txt")));
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(new JFrame(), "No existing contacts file",
-            "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(),
+            "No existing contacts file. Save a contact first.", "Error",
+            JOptionPane.ERROR_MESSAGE);
             return "";
         }
-    }
-
-    /**
-     * Handles the button press for reading and displaying contacts
-     * from a file.
-     */
-    public void readButtonPress() {
-        // Frame layout and title for displaying contact list
-        JFrame viewWindow = new JFrame();
-        final int contactsX = 600;
-        final int contactsY = 400;
-        viewWindow.setTitle("Contact List");
-        viewWindow.setSize(contactsX, contactsY);
-        viewWindow.add(new JScrollPane(contactsDisplay));
-        contactsDisplay.selectAll();
-        contactsDisplay.replaceSelection("");
-        // Call fileToString() to get string to display
-        String strToDisplay = fileToString();
-        // Format string to look nice
-        strToDisplay = strToDisplay.replaceAll(">", "\n");
-        // Append string to display
-        contactsDisplay.append(strToDisplay);
-        viewWindow.setVisible(true);
     }
 }

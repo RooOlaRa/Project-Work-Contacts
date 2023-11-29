@@ -85,7 +85,7 @@ public class Contact {
     * @return Formatted string that includes this.email
     */
     public String getEmail() {
-        return "Email: " + email + ">" + "--";
+        return "Email: " + email + ">" + "--" + "\n";
     }
 
     /**
