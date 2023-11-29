@@ -1,6 +1,9 @@
 # Checkstyle
 *.xml
 
+# Text file for project
+.txt
+
 # Compiled class file
 *.class
 

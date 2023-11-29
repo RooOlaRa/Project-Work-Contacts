@@ -2,11 +2,12 @@
 // TODO for ContactsApp: Make the buttons call on methods
 // for updating and deleting a contact(reading and saving done)
 
+import java.awt.GridLayout;
 import java.io.IOException;
-import java.io.FileReader;
-import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -14,8 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import java.awt.GridLayout;
-import java.util.stream.Collectors;
 
 /**
 * Simple contacts application for creating,
@@ -207,6 +206,20 @@ public class ContactsApp extends JFrame {
     }
 
     /**
+     * Gets data from file to String.
+     * @return String with from text file.
+     */
+    public String fileToString() {
+        try {
+            return new String(Files.readAllBytes(Paths.get("contacts.txt")));
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(new JFrame(), "No existing contacts file",
+            "Error", JOptionPane.ERROR_MESSAGE);
+            return "";
+        }
+    }
+
+    /**
      * Handles the button press for reading and displaying contacts
      * from a file.
      */
@@ -220,18 +233,12 @@ public class ContactsApp extends JFrame {
         viewWindow.add(new JScrollPane(contactsDisplay));
         contactsDisplay.selectAll();
         contactsDisplay.replaceSelection("");
-
-        try {
-            FileReader fr = new FileReader("contacts.txt");
-            BufferedReader reader = new BufferedReader(fr);
-            String strToDisplay = reader.lines().collect(Collectors.joining());
-            stringToDisplay = strToDisplay.replaceAll(">", "\n");
-            stringToDisplay = strToDisplay.replaceAll("--", "\n");
-            contactsDisplay.append(strToDisplay);
-            viewWindow.setVisible(true);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(new JFrame(), "No existing contacts",
-            "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        // Call fileToString() to get string to display
+        String strToDisplay = fileToString();
+        // Format string to look nice
+        strToDisplay = strToDisplay.replaceAll(">", "\n");
+        // Append string to display
+        contactsDisplay.append(strToDisplay);
+        viewWindow.setVisible(true);
     }
 }
