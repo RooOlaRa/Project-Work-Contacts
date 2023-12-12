@@ -1,4 +1,4 @@
-// TODO input validation
+// TODO regex for input validation
 
 import java.awt.GridLayout;
 import java.io.BufferedReader;
@@ -138,8 +138,8 @@ public class ContactsApp extends JFrame {
      * Handles the button press for saving a contact.
      */
     public void saveButtonPress() {
-        // Check for input errors
-        if (inputValidation()) {
+        // Check for input errors or if id already saved in file
+        if (inputValidation() || fileContainsId(true)) {
             return;
         }
         try {
@@ -177,7 +177,7 @@ public class ContactsApp extends JFrame {
         contactsDisplay.selectAll();
         contactsDisplay.replaceSelection("");
         // Call fileToString() to get string for display
-        String strToDisplay = fileToString();
+        String strToDisplay = fileToString(false);
         // Format string to look nice
         strToDisplay = strToDisplay.replaceAll(">", "\n");
         // Append string to display
@@ -191,18 +191,22 @@ public class ContactsApp extends JFrame {
      * wanted contact.
      */
     public void updateButtonPress() {
-        // Check for input errors
+        // Check for input errors and that file contains id to update
         if (inputValidation()) {
             return;
         }
         // String that replaces old information
         String replacement = getInformationString();
-        // Call editContact with replacement String
-        editContact(replacement);
-        // Create information message pane
-        infoPane("Contact updated");
+        if (fileToString(true).contains(id.getText().toUpperCase())) {
+            // Call editContact with replacement String
+            editContact(replacement);
+            // Create information message pane
+            infoPane("Contact updated");
+        } else {
+            // Create error message pane
+            errorPane("Id not found");
+        }
     }
-
 //----------------------DELETING-CONTACT-------------------------
     /**
      * Handles the button press for deleting contact in
@@ -212,10 +216,15 @@ public class ContactsApp extends JFrame {
     public void deleteButtonPress() {
         // String that replaces old information
         String replacement = "";
-        // Call editContact with replacement String
-        editContact(replacement);
-        // Create information message pane
-        infoPane("Contact deleted");
+        if (fileToString(true).contains(id.getText().toUpperCase())) {
+            // Call editContact with replacement String
+            editContact(replacement);
+            // Create information message pane
+            infoPane("Contact deleted");
+        } else {
+            // Create error message pane
+            errorPane("Id not found");
+        }
     }
 //----------------------ERROR-HANDLING-------------------------
     /**
@@ -228,17 +237,32 @@ public class ContactsApp extends JFrame {
     }
 
     /**
+     * Checks if file contains ID in textfield.
+     * @return true if file contains ID, otherwise false
+     */
+    public boolean fileContainsId(boolean saving) {
+        if (saving) {
+            if (fileToString(true).contains(id.getText().toUpperCase())) {
+                // Create error message pane
+                errorPane("Id already saved");
+                return true;
+            }
+            return false;
+        } else {
+            if (fileToString(false).contains(id.getText().toUpperCase())) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
      * Checks for errors in textfield input.
      * @return true if there are errors, otherwise false
      */
     public boolean inputValidation() {
         final int idLength = 11;
         // If ID is already saved in file then ERROR
-        if (fileToString().contains(id.getText().toUpperCase())) {
-            // Create error message pane
-            errorPane("Id already saved");
-            return true;
-        }
         // For checking if '-' is in the right index of id
         final int idCheck = 5;
         // If ID is in wrong format
@@ -310,13 +334,21 @@ public class ContactsApp extends JFrame {
      * Gets data from file to String.
      * @return String with from text file.
      */
-    public String fileToString() {
-        try {
-            return new String(Files.readAllBytes(Paths.get("contacts.txt")));
-        } catch (IOException e) {
-            // Create error message pane
-            errorPane("No existing contacts file. Save a contact first.");
-            return "";
+    public String fileToString(boolean saving) {
+        if (saving) {
+            try {
+                return new String(Files.readAllBytes(Paths.get("contacts.txt")));
+            } catch (IOException e) {
+                return "";
+            }
+        } else {
+            try {
+                return new String(Files.readAllBytes(Paths.get("contacts.txt")));
+            } catch (IOException e) {
+                // Create error message pane
+                errorPane("No existing contacts file. Save a contact first.");
+                return "";
+            }
         }
     }
 //----------------------FOR-UPDATING-AND-DELETING-------------------------
@@ -329,13 +361,7 @@ public class ContactsApp extends JFrame {
         // Get Id from textfield
         String idToUpdate = id.getText().toUpperCase();
         // Get String from File data
-        String currentContacts = fileToString();
-        // if idToUpdate is not found in currentContacts
-        if (!currentContacts.contains(idToUpdate)) {
-            // Create error message pane
-            errorPane("ID to update not found");
-            return;
-        }
+        String currentContacts = fileToString(false);
         // Start BufferedReader
         BufferedReader bReader = new BufferedReader(
                                 new StringReader(currentContacts));
