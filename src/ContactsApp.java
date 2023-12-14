@@ -409,7 +409,7 @@ public class ContactsApp extends JFrame {
             return true;
         }
 
-        // Validate optional input
+        // Validate optional input if fields are filled
         if (!email.getText().isEmpty()) {
             if (validateEmail()) {
                 return true;

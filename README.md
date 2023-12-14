@@ -14,15 +14,18 @@ cd src/ && javac *.java && java ContactsApp
 ## Saving contacts
 To save a contact you must fill the following mandatory text fields:
 
-Finnish ID number
+Finnish ID number | example: 131052-308T
 
-First Name
+First Name | example: Jack
 
-Last Name
+Last Name | example: Smith
 
-Phone Number
+Phone Number | example: +3584023423
 
-Address and e-mail are optional.
+Address and e-mail are optional. | address example: Hämeenkatu 1 | e-mail example: jack.smith@gmail.com
+
+Address must have at least the name of the road and number of the building. "Hämeenkatu" wont work but the example given before does.
+Can also be given more specifically for example: Hämeenkatu 1 A 232
 
 Then click the "Save Contact" button.
 
