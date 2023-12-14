@@ -183,6 +183,7 @@ public class ContactsApp extends JFrame {
      */
     public void readButtonPress() {
         final File f = new File("contacts.txt");
+        final int minStrToDisplay = 5;
         if (f.exists()) {
         // Empty contactsDisplay text area
         contactsDisplay.selectAll();
@@ -190,7 +191,7 @@ public class ContactsApp extends JFrame {
         // Call fileToString() to get string for display
         String strToDisplay = fileToString(false);
         // If no contacts are saved
-        if (strToDisplay.length() <= 5) {
+        if (strToDisplay.length() <= minStrToDisplay) {
             errorPane("Contacts are empty");
             return;
         }
@@ -378,7 +379,7 @@ public class ContactsApp extends JFrame {
     }
 
     /**
-     * Calls input validation for all textfields
+     * Calls input validation for all filled textfields.
      * @return true if there are errors, otherwise false
      */
     public boolean inputValidation() {
