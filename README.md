@@ -13,9 +13,13 @@ cd src/ && javac *.java && java ContactsApp
 
 ## Saving contacts
 To save a contact you must fill the following mandatory text fields:
+
 Finnish ID number
+
 First Name
+
 Last Name
+
 Phone Number
 
 Address and e-mail are optional.
