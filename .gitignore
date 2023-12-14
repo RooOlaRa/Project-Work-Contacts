@@ -2,7 +2,7 @@
 *.xml
 
 # Text file for project
-.txt
+*.txt
 
 # Compiled class file
 *.class
