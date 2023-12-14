@@ -4,6 +4,9 @@ Usage through a gui. Saved data includes personal id, first name, last name,
 phone number, address(optional) and e-mail(optional)
 All information saved to a text file which is stored persistently.
 
+### Screencast
+https://www.youtube.com/watch?v=H6XrAiYwWR8
+
 ## Why?
 Made as a student project for an introduction to programming course (Java)
 
