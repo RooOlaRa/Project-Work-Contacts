@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.StringReader;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -64,6 +65,11 @@ public class ContactsApp extends JFrame {
     * JTextField for entering the email of a contact (optional).
     */
     private JTextField email = new JTextField();
+
+    /**
+     * JFrame for contactsDisplay JTextArea to be added to.
+     */
+    private JFrame viewWindow = new JFrame();
 
     /**
     * JTextArea for displaying the list of contacts.
@@ -132,6 +138,16 @@ public class ContactsApp extends JFrame {
         read.addActionListener(e -> readButtonPress());
         update.addActionListener(e -> updateButtonPress());
         delete.addActionListener(e -> deleteButtonPress());
+
+        // Frame layout and title for displaying contact list
+        final int contactsX = 600;
+        final int contactsY = 400;
+        viewWindow.setTitle("Contact List");
+        viewWindow.setSize(contactsX, contactsY);
+        // Add scrollable component that has JTextArea inside.
+        viewWindow.add(new JScrollPane(contactsDisplay));
+        // Hide view window for contacts at start.
+        viewWindow.setVisible(false);
     }
 //----------------------SAVING-CONTACT-------------------------
     /**
@@ -166,23 +182,22 @@ public class ContactsApp extends JFrame {
      * from a file.
      */
     public void readButtonPress() {
-        // Frame layout and title for displaying contact list
-        JFrame viewWindow = new JFrame();
-        final int contactsX = 600;
-        final int contactsY = 400;
-        viewWindow.setTitle("Contact List");
-        viewWindow.setSize(contactsX, contactsY);
-        viewWindow.add(new JScrollPane(contactsDisplay));
-        // Empty contactsDisplay text area
-        contactsDisplay.selectAll();
-        contactsDisplay.replaceSelection("");
-        // Call fileToString() to get string for display
-        String strToDisplay = fileToString(false);
-        // Format string to look nice
-        strToDisplay = strToDisplay.replaceAll(">", "\n");
-        // Append string to display
-        contactsDisplay.append(strToDisplay);
-        viewWindow.setVisible(true);
+        final File f = new File("contacts.txt");
+        if (f.exists()) {
+            // Empty contactsDisplay text area
+            contactsDisplay.selectAll();
+            contactsDisplay.replaceSelection("");
+            // Call fileToString() to get string for display
+            String strToDisplay = fileToString(false);
+            // Format string to look nice
+            strToDisplay = strToDisplay.replaceAll(">", "\n");
+            // Append string to display
+            contactsDisplay.append(strToDisplay);
+            viewWindow.setVisible(true);
+        }
+        // Create error message pane
+        errorPane("No existing contacts file. Save a contact first.");
+        return;
     }
 //----------------------UPDATING-CONTACT-------------------------
     /**
@@ -238,9 +253,11 @@ public class ContactsApp extends JFrame {
 
     /**
      * Checks if file contains ID in textfield.
+     * @param saving true for use in saving button press,
+     * false otherwise
      * @return true if file contains ID, otherwise false
      */
-    public boolean fileContainsId(boolean saving) {
+    public boolean fileContainsId(final boolean saving) {
         if (saving) {
             if (fileToString(true).contains(id.getText().toUpperCase())) {
                 // Create error message pane
@@ -331,19 +348,24 @@ public class ContactsApp extends JFrame {
     }
 
     /**
-     * Gets data from file to String.
-     * @return String with from text file.
+     * Gets text from file to String.
+     * @param saving true for use in saving button press,
+     * false otherwise
+     * @return String with text from file. If
+     * no current file then return empty string.
      */
-    public String fileToString(boolean saving) {
+    public String fileToString(final boolean saving) {
         if (saving) {
             try {
-                return new String(Files.readAllBytes(Paths.get("contacts.txt")));
+                return new String(Files.readAllBytes(
+                            Paths.get("contacts.txt")));
             } catch (IOException e) {
                 return "";
             }
         } else {
             try {
-                return new String(Files.readAllBytes(Paths.get("contacts.txt")));
+                return new String(Files.readAllBytes(
+                            Paths.get("contacts.txt")));
             } catch (IOException e) {
                 // Create error message pane
                 errorPane("No existing contacts file. Save a contact first.");
@@ -360,7 +382,7 @@ public class ContactsApp extends JFrame {
     public void editContact(final String replacement) {
         // Get Id from textfield
         String idToUpdate = id.getText().toUpperCase();
-        // Get String from File data
+        // Get String from File
         String currentContacts = fileToString(false);
         // Start BufferedReader
         BufferedReader bReader = new BufferedReader(
