@@ -155,7 +155,7 @@ public class ContactsApp extends JFrame {
      */
     public void saveButtonPress() {
         // Check for input errors or if id already saved in file
-        if (inputValidation() || fileContainsId(true)) {
+        if (inputValidation() || fileContainsID(true)) {
             return;
         }
         try {
@@ -185,23 +185,23 @@ public class ContactsApp extends JFrame {
         final File f = new File("contacts.txt");
         final int minStrToDisplay = 5;
         if (f.exists()) {
-        // Empty contactsDisplay text area
-        contactsDisplay.selectAll();
-        contactsDisplay.replaceSelection("");
-        // Call fileToString() to get string for display
-        String strToDisplay = fileToString(false);
-        // If no contacts are saved
-        if (strToDisplay.length() <= minStrToDisplay) {
-            errorPane("Contacts are empty");
+            // Empty contactsDisplay text area
+            contactsDisplay.selectAll();
+            contactsDisplay.replaceSelection("");
+            // Call fileToString() to get string for display
+            String strToDisplay = fileToString(false);
+            // If no contacts are saved
+            if (strToDisplay.length() <= minStrToDisplay) {
+                errorPane("Contacts are empty");
+                return;
+            }
+            // Format string to look nice
+            strToDisplay = strToDisplay.replaceAll(">", "\n");
+            // Append string to display
+            contactsDisplay.append(strToDisplay);
+            viewWindow.setVisible(true);
             return;
         }
-        // Format string to look nice
-        strToDisplay = strToDisplay.replaceAll(">", "\n");
-        // Append string to display
-        contactsDisplay.append(strToDisplay);
-        viewWindow.setVisible(true);
-        return;
-    }
         // Create error message pane
         errorPane("No existing contacts file. Save a contact first.");
         return;
@@ -220,7 +220,7 @@ public class ContactsApp extends JFrame {
         // String that replaces old information
         String replacement = getContact();
         // If file contains id to update
-        if (fileContainsId(false)) {
+        if (fileContainsID(false)) {
             // Call editContact with replacement String
             editContact(replacement);
             // Create information message pane
@@ -244,7 +244,7 @@ public class ContactsApp extends JFrame {
         if (validateId()) {
             return;
         }
-        if (fileContainsId(false)) {
+        if (fileContainsID(false)) {
             // Call editContact with replacement String
             editContact(replacement);
             // Create information message pane
@@ -267,12 +267,13 @@ public class ContactsApp extends JFrame {
     }
 
     /**
-     * Checks if file contains ID in textfield.
-    * @param saving true for use in saving button press,
+     * Checks if file contains unique attribute in textfield
+     * (id, email, phone number).
+     * @param saving true for use in saving button press,
      * false otherwise
-     * @return true if file contains ID, otherwise false
+     * @return true if file contains unique, otherwise false
      */
-    public boolean fileContainsId(final boolean saving) {
+    public boolean fileContainsID(final boolean saving) {
         if (saving) {
             if (fileToString(true).contains(id.getText().toUpperCase())) {
                 // Create error message pane
@@ -309,7 +310,7 @@ public class ContactsApp extends JFrame {
      */
     public boolean validateId() {
         // regex for checking personal id format
-        final String idRegex = "^([0-9]){6}[-,A]{1}[0-9]{3}"
+        final String idRegex = "^[0-9]{6}[-,A]{1}[0-9]{3}"
                                 + "[0-9A-FHJ-NPS-Y]{1}$";
         // If personal id doesn't match id
         // regex
@@ -322,20 +323,22 @@ public class ContactsApp extends JFrame {
     }
 
     /**
-     * Validate that names are atleast 2 characters long.
+     * Validate that names with regex.
      * @return true if not correct, false otherwise
      */
     public boolean validateNames() {
-        // minimum length for first name
-        final int minFirstName = 2;
+        // regex for checking name format
+        // allows unicode characters.
+        final String nameRegex = "^[\\p{L}]{2,}$";
 
-        // minimum length for last name
-        final int minLastName = 2;
-
-        if (firstName.getText().length() < minFirstName
-            || lastName.getText().length() < minLastName) {
+        if (!firstName.getText().matches(nameRegex)) {
             // Create error message pane
-            errorPane("Names must be at least 2 characters long");
+            errorPane("Enter valid first name");
+            return true;
+        }
+        if (!lastName.getText().matches(nameRegex)) {
+            // Create error message pane
+            errorPane("Enter valid last name");
             return true;
         }
         return false;
@@ -347,13 +350,30 @@ public class ContactsApp extends JFrame {
      */
     public boolean validateNumber() {
         // regex for checking phone number format
-        final String phoneRegex = "^[+]?([0-9]){0,2}[-]?([0-9]){0,4}"
-                                    + "([0-9]){3,15}$";
+        final String phoneRegex = "^[+]?[0-9]{0,2}[-]?[0-9]{0,4}"
+                                    + "[0-9]{3,15}$";
         // if phone number doesn't match
         // phoneRegex
         if (!phoneNumber.getText().matches(phoneRegex)) {
             // Create error message pane
             errorPane("Enter valid phone number");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Validate address input with regex.
+     * @return true if not correct, false otherwise
+     */
+    public boolean validateAddress() {
+        // regex for checking address format
+        final String addressRegex = "^[\\p{L}]+[ ]{1}[0-9]+[A-Za-z]?"
+                                    + "[ ]?[0-9]{0,3}$";
+        // If address doesn't match regex
+        if (!address.getText().matches(addressRegex)) {
+            // Create error message pane
+            errorPane("Enter valid address");
             return true;
         }
         return false;
@@ -383,15 +403,23 @@ public class ContactsApp extends JFrame {
      * @return true if there are errors, otherwise false
      */
     public boolean inputValidation() {
+        // Validate mandatory input
         if (validateFields() || validateId()
-        || validateNames() || validateNames()) {
+        || validateNames() || validateNumber()) {
             return true;
         }
+
+        // Validate optional input
         if (!email.getText().isEmpty()) {
             if (validateEmail()) {
                 return true;
             }
-            return false;
+        }
+
+        if (!address.getText().isEmpty()) {
+            if (validateAddress()) {
+                return true;
+            }
         }
         return false;
     }
