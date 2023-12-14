@@ -9,7 +9,8 @@ Made as a student project for an introduction to programming course (Java)
 
 ## Compiling and running the application
 Compile and run the application using following command in your CLI while inside project root:
-cd src/ && javac *.java && java ContactsApp
+
+```cd src/ && javac *.java && java ContactsApp```
 
 ## Saving contacts
 To save a contact you must fill the following mandatory text fields:
